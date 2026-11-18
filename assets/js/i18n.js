@@ -2,15 +2,15 @@
 /* eslint-disable no-unused-vars */
 const SEIHON_I18N = {
   ja: {
-    tagline: 'PDF・画像を、オフラインで読める1つのHTMLの本に',
+    tagline: 'PDF・画像を、オフラインで読めるHTMLの本に',
     prefLang: '表示言語', prefSide: '設定パネルの位置', prefSideShort: 'パネル', prefTheme: 'テーマ',
     left: '左', right: '右', light: 'ライト', dark: 'ダーク',
     settings: '設定',
     tabBook: '本の設定', tabIndex: '目次・しおり', tabColophon: '奥付', tabExport: '書き出し',
     title: 'タイトル', titlePh: '無題の本',
     binding: '綴じ方向',
-    rtl: '右綴じ（右開き）', rtlHint: '縦書き・マンガなど。右から左へめくります',
-    ltr: '左綴じ（左開き）', ltrHint: '横書きの資料など。左から右へめくります',
+    rtl: '右綴じ（左へ進む）', rtlHint: '縦書き・マンガなど。右から左へめくります',
+    ltr: '左綴じ（右へ進む）', ltrHint: '横書きの資料など。左から右へめくります',
     viewMode: '表示', viewSpread: '見開き', viewSingle: '単ページ', viewAuto: '画面の幅に合わせる',
     viewHint: '「画面の幅に合わせる」は、横長の画面で見開き、縦長の画面で単ページになります。',
     coverSingle: '表紙（1ページ目）を単独で表示', pageNumbers: 'ページ番号を表示',
@@ -64,15 +64,15 @@ const SEIHON_I18N = {
     moved: 'ページを移動しました'
   },
   en: {
-    tagline: 'Bind PDFs and images into a single HTML book that works offline',
+    tagline: 'Bind PDFs and images into an HTML book you can read offline',
     prefLang: 'Language', prefSide: 'Settings panel position', prefSideShort: 'Panel', prefTheme: 'Theme',
     left: 'Left', right: 'Right', light: 'Light', dark: 'Dark',
     settings: 'Settings',
     tabBook: 'Book', tabIndex: 'Contents', tabColophon: 'Colophon', tabExport: 'Export',
     title: 'Title', titlePh: 'Untitled book',
     binding: 'Binding',
-    rtl: 'Right-bound (opens right)', rtlHint: 'Vertical text, manga, etc. Pages turn right to left',
-    ltr: 'Left-bound (opens left)', ltrHint: 'Horizontal text, documents. Pages turn left to right',
+    rtl: 'Right-bound (pages go left)', rtlHint: 'Vertical text, manga, etc. Pages turn right to left',
+    ltr: 'Left-bound (pages go right)', ltrHint: 'Horizontal text, documents. Pages turn left to right',
     viewMode: 'Display', viewSpread: 'Spread', viewSingle: 'Single page', viewAuto: 'Fit to screen',
     viewHint: '"Fit to screen" shows spreads on landscape screens and single pages on portrait screens.',
     coverSingle: 'Show the cover (page 1) on its own', pageNumbers: 'Show page numbers',
