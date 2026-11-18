@@ -1,0 +1,218 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Seihon 製本</title>
+  <meta name="description" content="PDFや画像をまとめて、オフラインで読める単独HTMLの「本」に製本するツール。処理はすべてブラウザ内で行います。">
+  <link rel="icon" href="assets/icon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+JP:wght@400;500;700&display=swap">
+  <link rel="stylesheet" href="assets/css/app.css">
+  <script>
+    // Apply saved theme before first paint (falls back to the OS / browser preference).
+    (function () {
+      var t = null;
+      try { t = localStorage.getItem('seihon.builder.theme'); } catch (e) {}
+      if (t !== 'light' && t !== 'dark') t = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      document.documentElement.dataset.theme = t;
+    })();
+  </script>
+</head>
+<body>
+  <header class="appbar">
+    <a class="brand" href="./" aria-label="Seihon">
+      <svg class="logo" viewBox="0 0 32 32" aria-hidden="true"><rect x="3" y="5" width="12" height="22" fill="var(--blue)"/><rect x="17" y="5" width="12" height="22" fill="var(--red)"/><rect x="15" y="5" width="2" height="22" fill="var(--green)"/></svg>
+      <span class="brand-name">Seihon</span><span class="brand-ja">製本</span>
+    </a>
+    <p class="tagline" data-i18n="tagline">PDF・画像を、オフラインで読める1つのHTMLの本に</p>
+    <div class="prefs">
+      <div class="seg" role="group" data-i18n-aria="prefLang">
+        <button type="button" data-pref="lang" data-value="ja" lang="ja">日本語</button>
+        <button type="button" data-pref="lang" data-value="en" lang="en">English</button>
+      </div>
+      <div class="seg" role="group" data-i18n-aria="prefSide">
+        <span class="seg-label" data-i18n="prefSideShort">パネル</span>
+        <button type="button" data-pref="side" data-value="left" data-i18n="left">左</button>
+        <button type="button" data-pref="side" data-value="right" data-i18n="right">右</button>
+      </div>
+      <div class="seg" role="group" data-i18n-aria="prefTheme">
+        <button type="button" data-pref="theme" data-value="light" data-i18n="light">ライト</button>
+        <button type="button" data-pref="theme" data-value="dark" data-i18n="dark">ダーク</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="layout" id="layout">
+    <aside class="panel" aria-labelledby="panel-title">
+      <h1 class="sr-only" id="panel-title" data-i18n="settings">設定</h1>
+      <nav class="rail" role="tablist" aria-orientation="vertical" data-i18n-aria="settings">
+        <button type="button" role="tab" id="tab-book" aria-controls="pane-book" aria-selected="true" data-tab="book">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h7v14H4zM13 5h7v14h-7z" fill="none" stroke="currentColor" stroke-width="2"/></svg>
+          <span data-i18n="tabBook">本の設定</span>
+        </button>
+        <button type="button" role="tab" id="tab-index" aria-controls="pane-index" aria-selected="false" data-tab="index" tabindex="-1">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 6h12M8 12h12M8 18h12M4 6h.01M4 12h.01M4 18h.01" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          <span data-i18n="tabIndex">目次・しおり</span>
+        </button>
+        <button type="button" role="tab" id="tab-colophon" aria-controls="pane-colophon" aria-selected="false" data-tab="colophon" tabindex="-1">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h12v18H6zM9 14h6M9 17h4" fill="none" stroke="currentColor" stroke-width="2"/></svg>
+          <span data-i18n="tabColophon">奥付</span>
+        </button>
+        <button type="button" role="tab" id="tab-export" aria-controls="pane-export" aria-selected="false" data-tab="export" tabindex="-1">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12M7 10l5 5 5-5M5 20h14" fill="none" stroke="currentColor" stroke-width="2"/></svg>
+          <span data-i18n="tabExport">書き出し</span>
+        </button>
+      </nav>
+
+      <div class="panel-body">
+        <!-- Book settings -->
+        <section class="pane" role="tabpanel" id="pane-book" aria-labelledby="tab-book">
+          <h2 data-i18n="tabBook">本の設定</h2>
+          <div class="field">
+            <label for="f-title" data-i18n="title">タイトル</label>
+            <input type="text" id="f-title" data-i18n-ph="titlePh" placeholder="無題の本" autocomplete="off">
+          </div>
+          <div class="field">
+            <span class="label" id="l-dir" data-i18n="binding">綴じ方向</span>
+            <div class="choice" role="radiogroup" aria-labelledby="l-dir">
+              <label><input type="radio" name="dir" value="rtl" checked><span><b data-i18n="rtl">右綴じ（右開き）</b><small data-i18n="rtlHint">縦書き・マンガなど。右から左へめくります</small></span></label>
+              <label><input type="radio" name="dir" value="ltr"><span><b data-i18n="ltr">左綴じ（左開き）</b><small data-i18n="ltrHint">横書きの資料など。左から右へめくります</small></span></label>
+            </div>
+          </div>
+          <div class="field">
+            <span class="label" id="l-view" data-i18n="viewMode">表示</span>
+            <div class="seg wide" role="radiogroup" aria-labelledby="l-view">
+              <label><input type="radio" name="view" value="spread"><span data-i18n="viewSpread">見開き</span></label>
+              <label><input type="radio" name="view" value="single"><span data-i18n="viewSingle">単ページ</span></label>
+              <label><input type="radio" name="view" value="auto" checked><span data-i18n="viewAuto">画面の幅に合わせる</span></label>
+            </div>
+            <p class="hint" data-i18n="viewHint">「画面の幅に合わせる」は、横長の画面で見開き、縦長の画面で単ページになります。</p>
+          </div>
+          <div class="field">
+            <label class="switch"><input type="checkbox" id="f-cover" checked><span class="track" aria-hidden="true"></span><span data-i18n="coverSingle">表紙（1ページ目）を単独で表示</span></label>
+            <label class="switch"><input type="checkbox" id="f-pnum" checked><span class="track" aria-hidden="true"></span><span data-i18n="pageNumbers">ページ番号を表示</span></label>
+          </div>
+        </section>
+
+        <!-- TOC & markers -->
+        <section class="pane" role="tabpanel" id="pane-index" aria-labelledby="tab-index" hidden>
+          <h2 data-i18n="toc">目次</h2>
+          <p class="hint" data-i18n="tocHint">見出しとページを選んで目次を作ります。読者は目次から各ページへ移動できます。</p>
+          <ol class="rows" id="toc-list"></ol>
+          <button type="button" class="btn ghost" id="toc-add"><span aria-hidden="true">＋</span> <span data-i18n="tocAdd">目次を追加</span></button>
+
+          <h2 class="mt" data-i18n="markers">しおり（注目マーカー）</h2>
+          <p class="hint" data-i18n="markersHint">読んでほしいページに印をつけます。ページ一覧のしおりボタンからも付けられます。</p>
+          <ol class="rows" id="marker-list"></ol>
+          <button type="button" class="btn ghost" id="marker-add"><span aria-hidden="true">＋</span> <span data-i18n="markerAdd">しおりを追加</span></button>
+        </section>
+
+        <!-- Colophon -->
+        <section class="pane" role="tabpanel" id="pane-colophon" aria-labelledby="tab-colophon" hidden>
+          <h2 data-i18n="tabColophon">奥付</h2>
+          <label class="switch"><input type="checkbox" id="c-on" checked><span class="track" aria-hidden="true"></span><span data-i18n="colophonOn">奥付ページを最後に付ける</span></label>
+          <p class="hint" data-i18n="colophonHint">入力した項目だけが載ります。URL（https://〜）はリンクになります。</p>
+          <div id="colophon-fields">
+            <div class="field"><label for="c-title" data-i18n="cTitle">作品名</label><input type="text" id="c-title" data-i18n-ph="cTitlePh" placeholder="空欄ならタイトルを使います"></div>
+            <div class="field"><label for="c-author" data-i18n="cAuthor">著者名</label><input type="text" id="c-author"></div>
+            <div class="field"><label for="c-circle" data-i18n="cCircle">サークル・発行者</label><input type="text" id="c-circle"></div>
+            <div class="field"><label for="c-date" data-i18n="cDate">発行日</label><input type="text" id="c-date" data-i18n-ph="cDatePh" placeholder="2026年11月23日 初版"></div>
+            <div class="field">
+              <span class="label" data-i18n="cLinks">SNS・連絡先</span>
+              <ol class="rows" id="link-list"></ol>
+              <button type="button" class="btn ghost" id="link-add"><span aria-hidden="true">＋</span> <span data-i18n="linkAdd">SNSを追加</span></button>
+            </div>
+            <div class="field"><label for="c-feedback" data-i18n="cFeedback">感想URL</label><input type="url" id="c-feedback" placeholder="https://"></div>
+            <div class="field"><label for="c-hashtag" data-i18n="cHashtag">ハッシュタグ</label><input type="text" id="c-hashtag" data-i18n-ph="cHashtagPh" placeholder="#作品名 #イベント名"></div>
+            <div class="field"><label for="c-note" data-i18n="cNote">ひとこと</label><textarea id="c-note" rows="3"></textarea></div>
+          </div>
+        </section>
+
+        <!-- Export -->
+        <section class="pane" role="tabpanel" id="pane-export" aria-labelledby="tab-export" hidden>
+          <h2 data-i18n="tabExport">書き出し</h2>
+          <div class="field">
+            <label for="e-size" data-i18n="imgSize">画像サイズ（長辺）</label>
+            <select id="e-size">
+              <option value="1280">1280 px</option>
+              <option value="1600" selected>1600 px</option>
+              <option value="2048">2048 px</option>
+              <option value="2560">2560 px</option>
+              <option value="3200">3200 px</option>
+            </select>
+            <p class="hint" data-i18n="imgSizeHint">大きいほど細部まで読めますが、ファイルが重くなります。画像は元より大きくはしません。</p>
+          </div>
+          <div class="field">
+            <span class="label" id="l-q" data-i18n="quality">画質（WebP）</span>
+            <div class="seg wide" role="radiogroup" aria-labelledby="l-q">
+              <label><input type="radio" name="quality" value="0.7"><span data-i18n="qLow">軽量</span></label>
+              <label><input type="radio" name="quality" value="0.82" checked><span data-i18n="qMid">標準</span></label>
+              <label><input type="radio" name="quality" value="0.92"><span data-i18n="qHigh">高画質</span></label>
+            </div>
+          </div>
+          <div class="field">
+            <label class="switch special"><input type="checkbox" id="e-enc"><span class="track" aria-hidden="true"></span><span data-i18n="encrypt">パスワードで暗号化</span></label>
+            <div id="enc-fields" hidden>
+              <div class="field"><label for="e-pass" data-i18n="password">パスワード</label><input type="password" id="e-pass" autocomplete="new-password"></div>
+              <div class="field"><label for="e-pass2" data-i18n="password2">パスワード（確認）</label><input type="password" id="e-pass2" autocomplete="new-password"></div>
+              <p class="hint" data-i18n="encHint">AES-256で暗号化します。パスワードを忘れると誰にも開けません。タイトルは暗号化されず、鍵の画面に表示されます。</p>
+            </div>
+          </div>
+          <div class="field">
+            <label for="e-file" data-i18n="fileName">ファイル名</label>
+            <div class="inline"><input type="text" id="e-file" data-i18n-ph="fileNamePh" placeholder="タイトルを使います"><span class="suffix">.html</span></div>
+          </div>
+          <div class="summary" id="summary"></div>
+          <div class="actions">
+            <button type="button" class="btn outline" id="btn-preview" data-i18n="preview">プレビュー</button>
+            <button type="button" class="btn decide" id="btn-build" data-i18n="build">製本してダウンロード</button>
+          </div>
+          <div class="progress" id="progress" hidden>
+            <div class="bar"><span id="progress-bar"></span></div>
+            <p id="progress-text" aria-live="polite"></p>
+          </div>
+        </section>
+      </div>
+    </aside>
+
+    <section class="workspace" id="workspace" aria-labelledby="ws-title">
+      <div class="toolbar">
+        <h2 class="sr-only" id="ws-title" data-i18n="pages">ページ</h2>
+        <button type="button" class="btn primary" id="btn-add"><span aria-hidden="true">＋</span> <span data-i18n="addFiles">ファイルを追加</span></button>
+        <button type="button" class="btn ghost" id="btn-blank" data-i18n="addBlank">白紙ページ</button>
+        <div class="sort" role="group" data-i18n-aria="sort">
+          <span class="seg-label" data-i18n="sort">並び替え</span>
+          <button type="button" data-sort="name"><span data-i18n="sortName">名前</span><i aria-hidden="true"></i></button>
+          <button type="button" data-sort="added"><span data-i18n="sortAdded">追加順</span><i aria-hidden="true"></i></button>
+          <button type="button" data-sort="size"><span data-i18n="sortSize">サイズ</span><i aria-hidden="true"></i></button>
+        </div>
+        <span class="count" id="page-count"></span>
+        <button type="button" class="btn ghost danger-text" id="btn-clear" data-i18n="clearAll">すべて削除</button>
+        <input type="file" id="file-input" multiple accept="application/pdf,image/png,image/jpeg,image/webp,image/gif,image/avif,image/bmp" hidden>
+      </div>
+
+      <div class="drop" id="drop">
+        <svg viewBox="0 0 48 48" aria-hidden="true"><path d="M10 8h12v32H10zM26 8h12v32H26z" fill="none" stroke="currentColor" stroke-width="2.5"/><path d="M24 4v8" stroke="currentColor" stroke-width="2.5"/></svg>
+        <p class="drop-title" data-i18n="dropTitle">PDF・画像をここにドロップ</p>
+        <p class="hint" data-i18n="dropHint">またはクリックして選択（PDF / PNG / JPEG / WebP など、複数可）。ファイルは外部に送信されません。</p>
+      </div>
+
+      <p class="hint grid-hint" id="grid-hint" data-i18n="gridHint" hidden>ドラッグで並び替え（タッチ操作では ⠿ をドラッグ）。見開きの組と、のど（綴じ側）の線を表示しています。</p>
+      <div class="grid" id="grid" aria-live="polite"></div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <span>2026 aburesoap</span><span aria-hidden="true">・</span><a href="https://github.com/aburesoap/seihon/blob/main/LICENSE">MIT License</a><span aria-hidden="true">・</span><a href="https://github.com/aburesoap/seihon">GitHub</a>
+  </footer>
+
+  <div class="dragover" id="dragover" hidden><p data-i18n="dropAnywhere">ドロップして追加</p></div>
+  <div class="toast" id="toast" role="status"></div>
+
+  <script src="assets/js/reader.js"></script>
+  <script src="assets/js/i18n.js"></script>
+  <script type="module" src="assets/js/app.js"></script>
+</body>
+</html>
