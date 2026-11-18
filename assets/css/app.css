@@ -96,7 +96,7 @@ a { color: var(--blue); }
 .seg > label { display: block; position: relative; }
 .seg > label > input { position: absolute; opacity: 0; pointer-events: none; }
 .seg > label > input:focus-visible + span { outline: 2px solid var(--blue); outline-offset: -2px; }
-.seg-label { font-size: 12px; color: var(--muted); padding: 5px 4px 5px 10px; align-self: center; }
+.seg-label { font-size: 12px; color: var(--muted); padding: 5px 9px; align-self: center; }
 .seg.wide { display: flex; }
 .seg.wide > label { flex: 1; text-align: center; }
 .seg.wide > label > span { padding: 8px 6px; font-size: 14px; }
@@ -173,10 +173,11 @@ input[type="text"], input[type="url"], input[type="password"], input[type="numbe
   border-radius: 0;
   min-width: 0;
 }
-input:focus, select:focus, textarea:focus { outline: 2px solid var(--blue); outline-offset: -1px; border-color: var(--blue); }
+input:not([type="radio"]):not([type="checkbox"]):focus, select:focus, textarea:focus { outline: 2px solid var(--blue); outline-offset: -1px; border-color: var(--blue); }
 textarea { resize: vertical; }
 .hint { font-size: 12.5px; color: var(--muted); margin: 6px 0 0; line-height: 1.6; }
-.pane > .hint { margin: -6px 0 12px; }
+.pane > h2 + .hint { margin: -6px 0 12px; }
+.switch + .hint { margin: 4px 0 16px; line-height: 1.7; }
 .inline { display: flex; align-items: center; }
 .inline .suffix { padding: 8px 10px; border: 1px solid var(--line); border-left: 0; background: var(--surface-2); color: var(--muted); font-size: 14px; }
 
@@ -193,6 +194,8 @@ textarea { resize: vertical; }
 }
 .choice label:hover { background: var(--surface-2); }
 .choice input { accent-color: var(--blue); margin-top: 4px; }
+.choice input:focus-visible { outline: none; }
+.choice label:has(input:focus-visible) { outline: 2px solid var(--blue); outline-offset: 2px; }
 .choice label:has(input:checked) { border-color: var(--blue); background: var(--blue-soft); }
 .choice b { display: block; font-weight: 500; font-size: 14px; }
 .choice small { display: block; color: var(--muted); font-size: 12px; }
